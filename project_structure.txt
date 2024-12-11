@@ -1,0 +1,18 @@
+library-management_system/
+|
+├── static
+│   ├── css
+│   │   ├── styles.css
+│   |── js
+│       ├── app.js
+
+├── templates
+│   ├── index.html
+
+├── .gitignore
+├── app.py
+├── database.py
+├── models.py
+├── project_outline.txt
+├── README.md
+└── requirement.txt
