@@ -100,16 +100,17 @@ def update_book(book_id):
 
 @app.route('/books/search', methods=['GET'])
 def search_books():
-    """Search for books"""
+    """Search for books by either title or author"""
     db = next(get_db())
     title = request.args.get('title', '')
     author = request.args.get('author', '')
 
     query = db.query(Book)
-    if title:
-        query = query.filter(Book.title.ilike(f'%{title}%'))
-    if author:
-        query = query.filter(Book.author.ilike(f'%{author}%'))
+    if title or author:
+        query = query.filter(or_(
+            Book.title.ilike(f'%{title}%'),
+            Book.author.ilike(f'%{author}%')
+        ))
 
     books = query.all()
     return jsonify([{
