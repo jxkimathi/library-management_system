@@ -2,11 +2,13 @@
 """"The Main Application Module"""
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 from sqlalchemy import or_
 from database import init_db, get_db
 from models import Book, Member, Transaction
 
 app = Flask(__name__)
+CORS(app)
 
 # Initialize database
 init_db()
@@ -100,19 +102,41 @@ def update_book(book_id):
 def search_books():
     """Search for books"""
     db = next(get_db())
-    query = request.args.get('query', '')
-    books = db.query(Book).filter(
-        or_(
-            Book.title.ilike(f'%{query}%'),
-            Book.author.ilike(f'%{query}%')
-        )
-    ).all()
+    title = request.args.get('title', '')
+    author = request.args.get('author', '')
+
+    query = db.query(Book)
+    if title:
+        query = query.filter(Book.title.ilike(f'%{title}%'))
+    if author:
+        query = query.filter(Book.author.ilike(f'%{author}%'))
+
+    books = query.all()
     return jsonify([{
         'id': book.id,
         'title': book.title,
         'author': book.author,
         'quantity': book.quantity
     } for book in books])
+
+
+@app.route('/books/<int:book_id>', methods=['DELETE'])
+def delete_book(book_id):
+    """Delete a book"""
+    try:
+        db = next(get_db())
+        book = db.query(Book).filter_by(id=book_id).first()
+
+        if not book:
+            return jsonify({'error': 'Book not found'}), 404
+
+        db.delete(book)
+        db.commit()
+        return jsonify({'message': 'Book deleted successfully'}), 200
+
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 # Members Routes
@@ -147,6 +171,49 @@ def add_member():
         'name': member.name,
         'email': member.email
     }), 201
+
+@app.route('/members/<int:member_id>', methods=['PUT'])
+def update_member(member_id):
+    """Updates a member"""
+    db = next(get_db())
+    member = db.query(Member).get(member_id)
+
+    if not member:
+        return jsonify({'error': 'Member not found'}), 404
+
+    data = request.json
+    member.name = data.get('name', member.name)
+    member.email = data.get('email', member.email)
+    member.phone = data.get('phone', member.phone)
+
+    db.commit()
+    db.refresh(member)
+
+    return jsonify({
+        'id': member.id,
+        'name': member.name,
+        'email': member.email,
+        'phone': member.phone
+    }), 200
+
+
+@app.route('/members/<int:member_id>', methods=['DELETE'])
+def delete_member(member_id):
+    """Deletes a member"""
+    try:
+        db = next(get_db())
+        member = db.query(Member).filter_by(id=member_id).first()
+
+        if not member:
+            return jsonify({'error': 'Member not found'}), 404
+
+        db.delete(member)
+        db.commit()
+        return jsonify({'message': 'Member deleted successfully'}), 200
+
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 # Transactions Routes
@@ -197,9 +264,9 @@ def return_book():
     member = transaction.member
     book.quantity += 1
 
-    # Calculate rent fee (KES 50 per day after 7 days)
+    # Calculate rent fee (KES 10 per day after 3 days)
     days_overdue = (datetime.now() - transaction.issue_date).days
-    rent_fee = max(0, (days_overdue - 7) * 50)
+    rent_fee = max(0, (days_overdue - 3) * 10)
 
     transaction.return_date = datetime.now()
     transaction.rent_fee = rent_fee
