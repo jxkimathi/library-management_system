@@ -13,21 +13,6 @@ A comprehensive system for managing library operations, including book inventory
 
 ## Installation
 
-```bash# Library Management System
-
-## Description
-
-A comprehensive system for managing library operations, including book inventory, member management, and circulation tracking.
-
-## Features
-
-- Book Catalog Management
-- Member Registration and Management
-- Fine Calculation
-- Search and Filter Books
-
-## Installation
-
 ```bash
 Fork the repository
 
@@ -92,41 +77,7 @@ Pull requests welcome. For major changes, open an issue first.
 
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
-
-## Conclusion
-
-The Library Management System provides a robust solution for modern libraries, streamlining daily operations and enhancing user experience. With its comprehensive features and user-friendly interface, it helps librarians efficiently manage resources while serving their community better.
-
-Thank you for visiting the repository!!
-
-Fork the repository
-
-# Clone repository
-git clone https://github.com/YOUR_USERNAME/library_management_system.git
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start application
-python3 app.py
-```
-
-## Usage
-
-1. Add books to catalog
-2. Register library members
-3. Process book loans and returns
-4. Generate circulation reports
-5. Manage fines and payments
-
-## Contributing
-
-Pull requests welcome. For major changes, open an issue first.
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
+This project is Licensed by [MIT](https://choosealicense.com/licenses/mit/)
 
 ## Conclusion
 
